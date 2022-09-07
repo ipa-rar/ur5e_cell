@@ -21,9 +21,6 @@ scaled_joint_trajectory_controller:
       - wrist_3_joint
     command_interfaces:
       - position
-      - velocity
-      - effort
     state_interfaces:
       - position
       - velocity
-      - effort

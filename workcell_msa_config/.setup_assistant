@@ -7,7 +7,7 @@ moveit_setup_assistant_config:
   package_settings:
     author_name: kut
     author_email: kut@ipa.de
-    generated_timestamp: 1662463554
+    generated_timestamp: 1662557640
   control_xacro:
     command:
       - position

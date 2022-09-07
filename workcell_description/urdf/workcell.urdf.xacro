@@ -6,13 +6,16 @@
     <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro" />
     <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
 
+    <xacro:property name="gripper_name" value="shunk_egp50" />
+    <xacro:property name="initial_positions_file" default="$(find workcell_description)/config/initial_positions.yaml" />
+
     <xacro:arg name="name" default="ur5e" />
     <xacro:arg name="ur_type" default="ur5e" />
     <xacro:arg name="prefix" default="" />
-    <xacro:arg name="joint_limit_params" default="$(find ur_description)/config/$(arg ur_type)/joint_limits.yaml" />
-    <xacro:arg name="kinematics_params" default="$(find ur_description)/config/$(arg ur_type)/default_kinematics.yaml" />
-    <xacro:arg name="physical_params" default="$(find ur_description)/config/$(arg ur_type)/physical_parameters.yaml" />
-    <xacro:arg name="visual_params" default="$(find ur_description)/config/$(arg ur_type)/visual_parameters.yaml" />
+    <xacro:arg name="joint_limit_params" default="$(find workcell_description)/config/$(arg ur_type)/joint_limits.yaml" />
+    <xacro:arg name="kinematics_params" default="$(find workcell_description)/config/$(arg ur_type)/default_kinematics.yaml" />
+    <xacro:arg name="physical_params" default="$(find workcell_description)/config/$(arg ur_type)/physical_parameters.yaml" />
+    <xacro:arg name="visual_params" default="$(find workcell_description)/config/$(arg ur_type)/visual_parameters.yaml" />
     <xacro:arg name="transmission_hw_interface" default="" />
     <xacro:arg name="safety_limits" default="false" />
     <xacro:arg name="safety_pos_margin" default="0.15" />
@@ -36,14 +39,10 @@
     <xacro:arg name="sim_gazebo" default="false" />
     <xacro:arg name="sim_ignition" default="false" />
     <xacro:arg name="simulation_controllers" default="" />
-    <xacro:arg name="initial_positions_file" default="$(find ur_description)/config/initial_positions.yaml" />
+    <xacro:arg name="initial_positions_file" default="$(find workcell_description)/config/initial_positions.yaml" />
     <xacro:arg name="use_nominal_extrinsics" default="false" />
     <xacro:arg name="add_plug" default="false" />
     <xacro:arg name="use_mesh" default="true" />
-
-
-    <xacro:property name="gripper_name" value="shunk_egp50" />
-    <xacro:property name="initial_positions_file" default="$(arg initial_positions_file)" />
 
     <xacro:schunk_egp50 />
     <xacro:ur_robot
