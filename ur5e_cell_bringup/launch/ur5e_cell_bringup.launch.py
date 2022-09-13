@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, ThisLaunchFileDir
+from launch.substitutions import LaunchConfiguration
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -11,7 +11,8 @@ def generate_launch_description():
     use_fake_hardware = LaunchConfiguration("use_fake_hardware")
     fake_sensor_commands = LaunchConfiguration("fake_sensor_commands")
     initial_joint_controller = LaunchConfiguration("initial_joint_controller")
-    activate_joint_controller = LaunchConfiguration("activate_joint_controller")
+    activate_joint_controller = LaunchConfiguration(
+        "activate_joint_controller")
     description_package = LaunchConfiguration("description_package")
     description_file = LaunchConfiguration("description_file")
 
@@ -92,8 +93,8 @@ def generate_launch_description():
     )
 
     moveit_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [FindPackageShare("ur5e_cell_msa_config"), "/launch", "/move_group.launch.py"]),
+        PythonLaunchDescriptionSource([FindPackageShare(
+            "ur5e_cell_msa_config"), "/launch", "/move_group.launch.py"]),
     )
     moveit_rviz_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([FindPackageShare(

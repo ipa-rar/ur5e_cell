@@ -11,10 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(ur5e_cell_description REQUIRED)
 find_package(ur5e_cell_msa_config REQUIRED)
 
-install(DIRECTORY 
-  launch 
-  DESTINATION share/${PROJECT_NAME}/)
-
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -27,5 +24,4 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
-
 ament_package()

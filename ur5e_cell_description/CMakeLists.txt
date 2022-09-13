@@ -14,10 +14,10 @@ find_package(ur_description)
 # add this line to include launch and urdf directory
 install(DIRECTORY 
   launch 
-  urdf 
-  meshes
-  config
-  srdf
+  urdf  
+  meshes 
+  config 
+  srdf 
   rviz
   DESTINATION share/${PROJECT_NAME}/)
 
