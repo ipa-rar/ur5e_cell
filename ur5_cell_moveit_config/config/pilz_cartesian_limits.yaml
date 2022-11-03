@@ -1,6 +1,82 @@
-# Limits for the Pilz planner
 cartesian_limits:
   max_trans_vel: 1.0
   max_trans_acc: 2.25
   max_trans_dec: -5.0
   max_rot_vel: 1.57
+joint_limits:
+  shoulder_pan_joint:
+    # acceleration limits are not publicly available
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_effort: 150.0
+    max_position: 3.14159265359
+    max_velocity: 1.57079632679
+    min_position: -3.14159265359
+    max_acceleration: 3.49
+  shoulder_lift_joint:
+    # acceleration limits are not publicly available
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_effort: 150.0
+    max_position: 3.14159265359
+    max_velocity: 1.57079632679
+    min_position: -3.14159265359
+    max_acceleration: 3.49
+  elbow_joint:
+    # acceleration limits are not publicly available
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_effort: 150.0
+    # we artificially limit this joint to half its actual joint position limit
+    # to avoid (MoveIt/OMPL) planning problems, as due to the physical
+    # construction of the robot, it's impossible to rotate the 'elbow_joint'
+    # over more than approx +- 1 pi (the shoulder lift joint gets in the way).
+    #
+    # This leads to planning problems as the search space will be divided into
+    # two sections, with no connections from one to the other.
+    #
+    # Refer to https://github.com/ros-industrial/universal_robot/issues/265 for
+    # more information.
+    max_position: 1.57079632679
+    max_velocity: 1.57079632679
+    min_position: -1.57079632679
+    max_acceleration: 3.49
+  wrist_1_joint:
+    # acceleration limits are not publicly available
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_effort: 28.0
+    max_position: 3.14159265359
+    max_velocity: 1.57079632679
+    min_position: -3.14159265359
+    max_acceleration: 3.49
+  wrist_2_joint:
+    # acceleration limits are not publicly available
+    has_acceleration_limits: true
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_effort: 28.0
+    max_position: 3.14159265359
+    max_velocity: 1.57079632679
+    min_position: -3.14159265359
+    max_acceleration: 3.49
+  wrist_3_joint:
+    # acceleration limits are not publicly available
+    has_effort_limits: true
+    has_position_limits: true
+    has_velocity_limits: true
+    max_effort: 28.0
+    max_position: 3.14159265359
+    max_velocity: 1.57079632679
+    min_position: -3.14159265359
+    has_acceleration_limits: true
+    max_acceleration: 3.49

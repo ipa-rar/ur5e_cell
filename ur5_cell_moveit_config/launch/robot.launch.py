@@ -1,4 +1,5 @@
 from os.path import join
+import pprint
 from launch import LaunchDescription
 from moveit_configs_utils import MoveItConfigsBuilder
 from moveit_configs_utils.launches import generate_demo_launch
@@ -13,6 +14,7 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
 
     moveit_config = MoveItConfigsBuilder("ur5_msa", package_name="ur5_cell_moveit_config").to_moveit_configs()
+    #pprint.pprint(moveit_config.to_dict())
     ld = LaunchDescription()
     ld.add_action(
         DeclareBooleanLaunchArg(

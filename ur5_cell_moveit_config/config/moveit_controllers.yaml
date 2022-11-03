@@ -6,6 +6,7 @@ moveit_simple_controller_manager:
   controller_names:
     #- scaled_joint_trajectory_controller
     - joint_trajectory_controller
+    #- speed_scaling_state_broadcaster
 
 
   # scaled_joint_trajectory_controller:
