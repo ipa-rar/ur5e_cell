@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         env:
-          - IMAGE: rolling-source
+          - IMAGE: humble
             CLANG_TIDY: false
     env:
       DOCKER_IMAGE: moveit/moveit2:${{ matrix.env.IMAGE }}
