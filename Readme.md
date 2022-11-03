@@ -38,9 +38,15 @@ ros2 launch ur5e_cell_bringup ur5e_cell_bringup.launch.py
 ```
 -----------------------------------------------------------
 
-### Issues
-- [ ] Need to fix the measurement values in the urdf files from the real world measurements @alb
-- [ ] Shunk EGP50 urdf is not perfect and needs to be exported directly from solidworks as urdf. @alb
+# Docker deployment on Real robot
 
-## Reference
-- [ROS wiki urdf](http://wiki.ros.org/urdf)
+Necessary for RVIZ2 
+````
+xhost local:root
+````
+
+Run docker container
+````
+docker-compose --file ~/ur_ws/src/ur5e_cell/docker/docker-compose.yaml up
+````
+-----------------------------------------------------------

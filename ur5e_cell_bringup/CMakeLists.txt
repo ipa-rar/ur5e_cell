@@ -9,7 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(ur5e_cell_description REQUIRED)
-find_package(ur5e_cell_msa_config REQUIRED)
+find_package(ur5_cell_moveit_config REQUIRED)
 
 install(DIRECTORY 
   launch 
