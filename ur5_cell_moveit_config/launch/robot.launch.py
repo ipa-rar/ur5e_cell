@@ -96,7 +96,6 @@ def generate_launch_description():
     ld.add_action(
         Node(
             package="ur_robot_driver",
-            condition=IfCondition("True") and UnlessCondition("False"),
             executable="dashboard_client",
             name="dashboard_client",
             output="screen",
@@ -112,7 +111,6 @@ def generate_launch_description():
             name="controller_stopper",
             output="screen",
             emulate_tty=True,
-            condition=UnlessCondition("False"),
             parameters=[
                 {"headless_mode": True},
                 {"joint_controller_active": False},
