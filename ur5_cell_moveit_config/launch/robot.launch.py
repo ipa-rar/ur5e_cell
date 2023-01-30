@@ -1,21 +1,101 @@
 from os.path import join
 import pprint
+from typing import Callable, List, Optional
 from launch import LaunchDescription
+from launch import LaunchContext
+from launch import LaunchDescriptionEntity
+from launch.action import Action
+from launch.actions import SetLaunchConfiguration
+from launch.actions import OpaqueFunction
+from launch import SomeSubstitutionsType
+from launch.utilities import normalize_to_list_of_substitutions
+from launch.utilities import perform_substitutions
+
 from moveit_configs_utils import MoveItConfigsBuilder
-from moveit_configs_utils.launches import generate_demo_launch
+from moveit_configs_utils.launches import (
+    generate_static_virtual_joint_tfs_launch,
+    generate_rsp_launch,
+    generate_move_group_launch,
+    generate_warehouse_db_launch,
+    generate_spawn_controllers_launch,
+    generate_moveit_rviz_launch
+    )   
 from launch_ros.actions import Node
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import UnlessCondition, IfCondition
 from moveit_configs_utils.launch_utils import DeclareBooleanLaunchArg
 from launch.substitutions import LaunchConfiguration
+from launch import LaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 
-def generate_launch_description():
+class MoveItConfigLoader(Action):
+    def __init__(
+        self,
+        robot_name: SomeSubstitutionsType,
+        package_name: SomeSubstitutionsType,
+        mappings: Optional[dict] = None,
+        **kwargs
+    ) -> None:
+        super().__init__(**kwargs)
+        self.__robot_name = normalize_to_list_of_substitutions(robot_name)
+        self.__package_name = normalize_to_list_of_substitutions(package_name)
+        self.__mappings = mappings
+        
+    def execute(self, context: LaunchContext) -> Optional[List[LaunchDescriptionEntity]]:
+        moveit_config_builder = MoveItConfigsBuilder(
+            robot_name=perform_substitutions(context, self.__robot_name), 
+            package_name=perform_substitutions(context, self.__package_name)
+            )
+        moveit_config_builder.robot_description(mappings=self.__mappings)
+        moveit_config = moveit_config_builder.to_moveit_configs()
+        
+        # Add the moveit config to the launch context
+        context.extend_locals({'moveit_config': moveit_config})
+        
+        #Create important launch configuration variables
+        moveit_package_path = SetLaunchConfiguration(
+            "moveit_package_path", 
+            value=str(moveit_config.package_path))
+        moveit_robot_description = SetLaunchConfiguration(
+            "moveit_robot_description", 
+            value=moveit_config.robot_description)
+        moveit_ros2_controllers_file = SetLaunchConfiguration("moveit_ros2_controllers_file", value=str(moveit_config.package_path / "config/ros2_controllers.yaml"))
+        return [moveit_package_path, moveit_robot_description, moveit_ros2_controllers_file]
+        
+class IncludeMoveitLaunchDescription(Action):
+    def __init__(
+        self, *,
+        function: Callable,
+        **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.__function = function
+    
+    def execute(self, context: LaunchContext) -> Optional[List[LaunchDescriptionEntity]]:
+        return [self.__function(context.get_locals_as_dict()["moveit_config"])]
 
-    moveit_config = MoveItConfigsBuilder("ur5_msa", package_name="ur5_cell_moveit_config").to_moveit_configs()
-    #pprint.pprint(moveit_config.to_dict())
+
+def generate_launch_description():
     ld = LaunchDescription()
+    
+    ld.add_action(DeclareLaunchArgument(
+        "robot_name",
+        default_value="ur5_msa",
+        description="The name of the robot - should be prefix of the xacro describing the robot (robot_name.urdf.xacro)."
+    ))
+
+    ld.add_action(DeclareLaunchArgument(
+        "package_name",
+        default_value="ur5_msa",
+        description="The name of the moveit config package."
+    ))
+    
+    ld.add_action(DeclareLaunchArgument(
+        "robot_ip",
+        default_value="192.168.56.2",
+        description="IP address of the robot."
+    ))
+    
     ld.add_action(
         DeclareBooleanLaunchArg(
             "db",
@@ -30,65 +110,61 @@ def generate_launch_description():
             description="By default, we are not in debug mode",
         )
     )
+    
     ld.add_action(
         DeclareBooleanLaunchArg(
             "use_rviz", 
             default_value=True)
         )
     
-
-    virtual_joints_launch = (
-        moveit_config.package_path / "launch/static_virtual_joint_tfs.launch.py"
+    ld.add_action(
+        MoveItConfigLoader(
+            "ur5_msa", 
+            "ur5_cell_moveit_config", 
+            mappings={
+                "use_fake_hardware":"True",
+                "fake_sensor_commands":"True",
+                }
+            )
     )
     
-    if virtual_joints_launch.exists():
-        ld.add_action(
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(str(virtual_joints_launch)),
-            )
-        )
+    
 
     ld.add_action(
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                str(moveit_config.package_path / "launch/rsp.launch.py")
-            ),
-        )
+        IncludeMoveitLaunchDescription(
+            function=generate_static_virtual_joint_tfs_launch)
     )
 
     ld.add_action(
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                str(moveit_config.package_path / "launch/move_group.launch.py")
-            ),
-        )
+        IncludeMoveitLaunchDescription(
+            function=generate_rsp_launch)
+    )
+    
+    ld.add_action(
+        IncludeMoveitLaunchDescription(
+            function=generate_moveit_rviz_launch)
     )
 
     ld.add_action(
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                str(moveit_config.package_path / "launch/moveit_rviz.launch.py")
-            ),
-            condition=IfCondition(LaunchConfiguration("use_rviz")),
-        )
+        IncludeMoveitLaunchDescription(
+            function=generate_move_group_launch,
+        condition=IfCondition(LaunchConfiguration("use_rviz")))
+    )
+    
+    ld.add_action(
+        IncludeMoveitLaunchDescription(
+            function=generate_warehouse_db_launch,
+        condition=IfCondition(LaunchConfiguration("db")))
     )
 
-    ld.add_action(
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                str(moveit_config.package_path / "launch/warehouse_db.launch.py")
-            ),
-            condition=IfCondition(LaunchConfiguration("db")),
-        )
-    )
-    # UR hardware specific things
+    # UR hardware specific things    
     ld.add_action(
         Node(
             package="ur_robot_driver",
             executable="ur_ros2_control_node",
             parameters=[
-                moveit_config.robot_description, 
-                str(moveit_config.package_path / "config/ros2_controllers.yaml")],
+                LaunchConfiguration('moveit_robot_description'), 
+                LaunchConfiguration('moveit_ros2_controllers_file')],
             output="screen"
         )
     )    
@@ -96,12 +172,11 @@ def generate_launch_description():
     ld.add_action(
         Node(
             package="ur_robot_driver",
-            condition=IfCondition("True") and UnlessCondition("False"),
             executable="dashboard_client",
             name="dashboard_client",
             output="screen",
             emulate_tty=True,
-            parameters=[{"robot_ip": "192.168.56.2"}],
+            parameters=[{"robot_ip": LaunchConfiguration("robot_ip")}],
         )
     )
     
@@ -112,7 +187,6 @@ def generate_launch_description():
             name="controller_stopper",
             output="screen",
             emulate_tty=True,
-            condition=UnlessCondition("False"),
             parameters=[
                 {"headless_mode": True},
                 {"joint_controller_active": False},
@@ -129,11 +203,8 @@ def generate_launch_description():
     )
 
     ld.add_action(
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                str(moveit_config.package_path / "launch/spawn_controllers.launch.py")
-            ),
-        )
+        IncludeMoveitLaunchDescription(
+            function=generate_spawn_controllers_launch)
     )
     
     return ld
