@@ -1,4 +1,4 @@
-# Default initial positions for ur5_msa's ros2_control fake system
+# Default initial positions for ur5e_workcell's ros2_control fake system
 
 initial_positions:
   elbow_joint: 0

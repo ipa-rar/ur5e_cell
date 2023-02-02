@@ -11,6 +11,6 @@
     <xacro:arg name="fake_sensor_commands" default="true" />
     <xacro:arg name="robot_ip" default="192.168.56.2" />
     <xacro:arg name="prefix" default="" />
-    <!-- Import ur5_msa urdf file -->
+    <!-- Import ur5e_workcell urdf file -->
     <xacro:include filename="$(find ur5e_cell_description)/urdf/workcell.urdf.xacro" />
 </robot>

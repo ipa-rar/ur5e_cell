@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.2)
-project(ur5_cell_moveit_config)
+project(ur5e_cell_moveit_config)
 
 find_package(ament_cmake REQUIRED)
 
