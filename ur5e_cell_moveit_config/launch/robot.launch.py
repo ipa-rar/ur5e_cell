@@ -159,6 +159,13 @@ def generate_launch_description():
         function=generate_spawn_controllers_launch
     )
     
+
+    io_and_status_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["io_and_status_controller", "-c", "/controller_manager"],
+    )
+    
     ld = LaunchDescription(
         [
             database_config,
@@ -177,6 +184,7 @@ def generate_launch_description():
             ur_controller_stopper_node,
             #container,
             #moveit_servo_node,
+            io_and_status_controller_spawner,
             generate_controllers_ld
         ]
     )
