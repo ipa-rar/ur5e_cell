@@ -68,14 +68,14 @@ def generate_launch_description():
     #     function=generate_rsp_launch
     # )
     
-    # generate_move_group_ld = GenerateMoveitLaunch(
-    #     function=generate_move_group_launch
-    # )
+    generate_move_group_ld = GenerateMoveitLaunch(
+        function=generate_move_group_launch
+    )
     
-    # generate_moveit_rviz_ld = GenerateMoveitLaunch(
-    #     function=generate_moveit_rviz_launch,
-    #     condition=IfCondition(LaunchConfiguration("use_rviz"))
-    # )
+    generate_moveit_rviz_ld = GenerateMoveitLaunch(
+        function=generate_moveit_rviz_launch,
+        condition=IfCondition(LaunchConfiguration("use_rviz"))
+    )
     
     # generate_warehouse_db_ld = GenerateMoveitLaunch(
     #     function=generate_warehouse_db_launch,
@@ -193,8 +193,6 @@ def generate_launch_description():
             # load_servo_config,
             # generate_virtual_joint_ld,
             # generate_rsp_ld,
-            # generate_move_group_ld,
-            # generate_moveit_rviz_ld,
             # generate_warehouse_db_ld,
             ur_control_launch,
             #ur_ros2_control_node,
@@ -202,6 +200,8 @@ def generate_launch_description():
             #ur_controller_stopper_node,
             #container,
             #moveit_servo_node,
+            generate_move_group_ld,
+            generate_moveit_rviz_ld,
             io_and_status_controller_spawner,
             # generate_controllers_ld
         ]
