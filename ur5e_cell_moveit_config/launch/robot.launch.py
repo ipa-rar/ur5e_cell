@@ -11,7 +11,7 @@ from moveit_configs_utils.launches import (
     generate_warehouse_db_launch
 )
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import UnlessCondition, IfCondition
 from moveit_configs_utils.launch_utils import DeclareBooleanLaunchArg
@@ -50,79 +50,96 @@ def generate_launch_description():
             description="The IP address of the robot to connect to."
         )
     
-    load_servo_config = LoadYaml(
-        package="ur5e_cell_moveit_config",
-        file="config/moveit_servo.yaml",
-        configuration_variable="moveit_servo"
-    )
+    # load_servo_config = LoadYaml(
+    #     package="ur5e_cell_moveit_config",
+    #     file="config/moveit_servo.yaml",
+    #     configuration_variable="moveit_servo"
+    # )
     
     load_moveit_config = LoadMoveitConfig(
         robot_name="ur5e_workcell_fake",
         package_name="ur5e_cell_moveit_config")
 
-    generate_virtual_joint_ld = GenerateMoveitLaunch(
-        function=generate_static_virtual_joint_tfs_launch
+    # generate_virtual_joint_ld = GenerateMoveitLaunch(
+    #     function=generate_static_virtual_joint_tfs_launch
+    # )
+    
+    # generate_rsp_ld = GenerateMoveitLaunch(
+    #     function=generate_rsp_launch
+    # )
+    
+    # generate_move_group_ld = GenerateMoveitLaunch(
+    #     function=generate_move_group_launch
+    # )
+    
+    # generate_moveit_rviz_ld = GenerateMoveitLaunch(
+    #     function=generate_moveit_rviz_launch,
+    #     condition=IfCondition(LaunchConfiguration("use_rviz"))
+    # )
+    
+    # generate_warehouse_db_ld = GenerateMoveitLaunch(
+    #     function=generate_warehouse_db_launch,
+    #     condition=IfCondition(LaunchConfiguration("db"))
+    # )
+    
+    ur_control_launch = IncludeLaunchDescription(
+        launch_description_source=PythonLaunchDescriptionSource(
+            PathJoinSubstitution([FindPackageShare("ur_robot_driver"), "launch", "ur_control.launch.py"])
+        ),
+        launch_arguments={
+            "ur_type": "ur5e",              
+            "use_fake_hardware": "false",
+            "initial_joint_controller": "joint_trajectory_controller",
+            "activate_joint_controller": "true",
+            "robot_ip": "192.168.56.2",
+            "description_package": "ur5e_cell_description",
+            "description_file": "workcell.urdf.xacro",
+            "launch_rviz": "false"
+            }.items()
     )
     
-    generate_rsp_ld = GenerateMoveitLaunch(
-        function=generate_rsp_launch
-    )
-    
-    generate_move_group_ld = GenerateMoveitLaunch(
-        function=generate_move_group_launch
-    )
-    
-    generate_moveit_rviz_ld = GenerateMoveitLaunch(
-        function=generate_moveit_rviz_launch,
-        condition=IfCondition(LaunchConfiguration("use_rviz"))
-    )
-    
-    generate_warehouse_db_ld = GenerateMoveitLaunch(
-        function=generate_warehouse_db_launch,
-        condition=IfCondition(LaunchConfiguration("db"))
-    )
 
     # UR hardware specific things
-    ur_ros2_control_node = Node(
-            package="ur_robot_driver",
-            executable="ur_ros2_control_node",
-            parameters=[
-                {"robot_description": LaunchConfiguration("moveit_robot_description")}, 
-                PathJoinSubstitution([LaunchConfiguration('moveit_package_path'), "config", "ros2_controllers.yaml"])
-                ],
-            output="screen"
-        )
+    # ur_ros2_control_node = Node(
+    #         package="ur_robot_driver",
+    #         executable="ur_ros2_control_node",
+    #         parameters=[
+    #             {"robot_description": LaunchConfiguration("moveit_robot_description")}, 
+    #             PathJoinSubstitution([LaunchConfiguration('moveit_package_path'), "config", "ros2_controllers.yaml"])
+    #             ],
+    #         output="screen"
+    #     )
     
-    ur_dashboard_client = Node(
-            package="ur_robot_driver",
-            condition=IfCondition("True") and UnlessCondition("False"),
-            executable="dashboard_client",
-            name="dashboard_client",
-            output="screen",
-            emulate_tty=True,
-            parameters=[{"robot_ip": "192.168.56.2"}],
-        )
+    # ur_dashboard_client = Node(
+    #         package="ur_robot_driver",
+    #         condition=IfCondition("True") and UnlessCondition("False"),
+    #         executable="dashboard_client",
+    #         name="dashboard_client",
+    #         output="screen",
+    #         emulate_tty=True,
+    #         parameters=[{"robot_ip": "192.168.56.2"}],
+    #     )
     
-    ur_controller_stopper_node = Node(
-            package="ur_robot_driver",
-            executable="controller_stopper_node",
-            name="controller_stopper",
-            output="screen",
-            emulate_tty=True,
-            condition=UnlessCondition("False"),
-            parameters=[
-                {"headless_mode": True},
-                {"joint_controller_active": False},
-                {
-                    "consistent_controllers": [
-                        "io_and_status_controller",
-                        "force_torque_sensor_broadcaster",
-                        "joint_state_broadcaster",
-                        "speed_scaling_state_broadcaster",
-                    ]
-                },
-            ],
-        )
+    # ur_controller_stopper_node = Node(
+    #         package="ur_robot_driver",
+    #         executable="controller_stopper_node",
+    #         name="controller_stopper",
+    #         output="screen",
+    #         emulate_tty=True,
+    #         condition=UnlessCondition("False"),
+    #         parameters=[
+    #             {"headless_mode": True},
+    #             {"joint_controller_active": False},
+    #             {
+    #                 "consistent_controllers": [
+    #                     "io_and_status_controller",
+    #                     "force_torque_sensor_broadcaster",
+    #                     "joint_state_broadcaster",
+    #                     "speed_scaling_state_broadcaster",
+    #                 ]
+    #             },
+    #         ],
+    #     )
     
     # moveit_servo_node = Node(
     #     package="moveit_servo",
@@ -155,9 +172,9 @@ def generate_launch_description():
     #     output="screen",
     # )
     
-    generate_controllers_ld = GenerateMoveitLaunch(
-        function=generate_spawn_controllers_launch
-    )
+    # generate_controllers_ld = GenerateMoveitLaunch(
+    #     function=generate_spawn_controllers_launch
+    # )
     
 
     io_and_status_controller_spawner = Node(
@@ -173,19 +190,20 @@ def generate_launch_description():
             rviz_config,
             robot_ip_config,
             load_moveit_config,
-            load_servo_config,
-            generate_virtual_joint_ld,
-            generate_rsp_ld,
-            generate_move_group_ld,
-            generate_moveit_rviz_ld,
-            generate_warehouse_db_ld,
-            ur_ros2_control_node,
-            ur_dashboard_client,
-            ur_controller_stopper_node,
+            # load_servo_config,
+            # generate_virtual_joint_ld,
+            # generate_rsp_ld,
+            # generate_move_group_ld,
+            # generate_moveit_rviz_ld,
+            # generate_warehouse_db_ld,
+            ur_control_launch,
+            #ur_ros2_control_node,
+            #ur_dashboard_client,
+            #ur_controller_stopper_node,
             #container,
             #moveit_servo_node,
             io_and_status_controller_spawner,
-            generate_controllers_ld
+            # generate_controllers_ld
         ]
     )
     return ld

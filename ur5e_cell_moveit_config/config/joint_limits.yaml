@@ -15,9 +15,9 @@ joint_limits:
     has_position_limits: true
     has_velocity_limits: true
     max_effort: 150.0
-    max_position: 3.14159265359
+    max_position: -0.35
     max_velocity: 1.57079632679
-    min_position: -3.14159265359
+    min_position: -2.0
     max_acceleration: 3.49
   shoulder_lift_joint:
     # acceleration limits are not publicly available
@@ -26,9 +26,9 @@ joint_limits:
     has_position_limits: true
     has_velocity_limits: true
     max_effort: 150.0
-    max_position: 3.14159265359
+    max_position: 0.0
     max_velocity: 1.57079632679
-    min_position: -3.14159265359
+    min_position: -2.0
     max_acceleration: 3.49
   elbow_joint:
     # acceleration limits are not publicly available
@@ -47,9 +47,9 @@ joint_limits:
     #
     # Refer to https://github.com/ros-industrial/universal_robot/issues/265 for
     # more information.
-    max_position: 1.57079632679
+    max_position: 0.0
     max_velocity: 1.57079632679
-    min_position: -1.57079632679
+    min_position: -3.14159265359
     max_acceleration: 3.49
   wrist_1_joint:
     # acceleration limits are not publicly available
