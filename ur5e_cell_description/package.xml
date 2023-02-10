@@ -15,6 +15,10 @@
   <depend>ur_moveit_config</depend>
   <depend>ur_robot_driver</depend>
   <depend>realsense2_description</depend>
+  <depend>moveit</depend>
+  <depend>moveit_ros</depend>
+  <depend>moveit_setup_assistant</depend>
+
   <exec_depend>ros2launch</exec_depend>
   <test_depend>ament_lint_auto</test_depend>
 
